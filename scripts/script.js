@@ -50,22 +50,34 @@ const gameController = (function () {
       [2, 4, 6],
     ];
 
-    const winner = winStates.filter(
+    const winningSign = winStates.filter(
       (state) =>
         state.every((index) => board[index] === "x") ||
         state.every((index) => board[index] === "o")
     )[0];
 
-    return winner;
+    return winningSign;
   };
 
   // playRound can call checkWin (helper function)
   const playRound = (board, index) => {
+    let winner = "";
+
     board.setBoardTile(_currentPlayer.getSign(), index);
+
+    if (_roundCount >= 5) {
+      winner = _checkWin(board);
+
+      if (_roundCount === 9 && !winner) {
+        winner = "Tie";
+      }
+    }
 
     // alternate between players and update round count
     _currentPlayer = _playerOne ? _playerTwo : _playerOne;
     _roundCount += 1;
+
+    return winner;
   };
 
   return { initPlayers, playRound };
