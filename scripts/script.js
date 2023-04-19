@@ -18,7 +18,11 @@ const gameBoard = (function () {
 
   const getBoard = () => _boardTiles;
 
-  return { setBoardTile, getBoard };
+  const resetBoard = () => {
+    _boardTiles.fill("");
+  };
+
+  return { setBoardTile, getBoard, resetBoard };
 })();
 
 // GAME CONTROLLER
