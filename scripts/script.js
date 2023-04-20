@@ -16,13 +16,15 @@ const gameBoard = (function () {
     _boardTiles[index] = sign;
   };
 
+  const getBoardTile = (index) => _boardTiles[index];
+
   const getBoard = () => _boardTiles;
 
   const resetBoard = () => {
     _boardTiles.fill("");
   };
 
-  return { setBoardTile, getBoard, resetBoard };
+  return { setBoardTile, getBoardTile, getBoard, resetBoard };
 })();
 
 // GAME CONTROLLER
@@ -30,15 +32,16 @@ const gameBoard = (function () {
 const gameController = (function () {
   let _playerOne = null;
   let _playerTwo = null;
-  let _currentPlayer = _playerOne;
+  let _currentPlayer = null;
   let _roundCount = 1;
+  let _winningPlayer = null;
+  let _gameOver = true;
 
-  const initPlayers = (nameOne, signOne, nameTwo, signTwo) => {
-    _playerOne = Player(nameOne, signOne);
-    _playerTwo = Player(nameTwo, signTwo);
-  };
+  const getCurrentPlayer = () => _currentPlayer;
+  const getWinningPlayer = () => _winningPlayer;
+  const getGameStatus = () => _gameOver;
 
-  const _checkWin = (board) => {
+  const _checkWin = (boardArray) => {
     const winStates = [
       [0, 1, 2],
       [3, 4, 5],
@@ -52,70 +55,108 @@ const gameController = (function () {
 
     const winningSign = winStates.filter(
       (state) =>
-        state.every((index) => board[index] === "x") ||
-        state.every((index) => board[index] === "o")
-    )[0];
+        state.every((index) => boardArray[index] === "x") ||
+        state.every((index) => boardArray[index] === "o")
+    );
 
-    return winningSign;
+    return winningSign.length > 0 ? boardArray[winningSign[0][0]] : "";
   };
 
-  // playRound can call checkWin (helper function)
+  const initPlayers = (nameOne, signOne, nameTwo, signTwo) => {
+    _playerOne = Player(nameOne, signOne);
+    _playerTwo = Player(nameTwo, signTwo);
+
+    _currentPlayer = _playerOne;
+    _gameOver = false;
+  };
+
   const playRound = (board, index) => {
-    let winner = "";
+    // don't allow player to select already used tiles
+    if (board.getBoardTile(index)) {
+      return;
+    }
 
     board.setBoardTile(_currentPlayer.getSign(), index);
 
-    if (_roundCount >= 5) {
-      winner = _checkWin(board);
+    // alternate between players
+    _currentPlayer = _currentPlayer === _playerOne ? _playerTwo : _playerOne;
 
-      if (_roundCount === 9 && !winner) {
-        winner = "Tie";
+    if (_roundCount >= 5) {
+      _winningPlayer = _checkWin(board.getBoard());
+
+      if (_winningPlayer) {
+        board.resetBoard();
+        _gameOver = true;
+        _roundCount = 1;
+        return;
+      }
+      if (_roundCount === 9) {
+        board.resetBoard();
+        _winningPlayer = "Tie";
+        _gameOver = true;
+        _roundCount = 1;
+        return;
       }
     }
 
-    // alternate between players and update round count
-    _currentPlayer = _playerOne ? _playerTwo : _playerOne;
     _roundCount += 1;
-
-    return winner;
   };
 
-  return { initPlayers, playRound };
+  return {
+    initPlayers,
+    playRound,
+    getCurrentPlayer,
+    getWinningPlayer,
+    getGameStatus,
+  };
 })();
 
 // DISPLAY
 
 const displayController = (function () {
-  // functions to handle event listeners
-  // will make calls to functions in other modules
   const _startButton = document.querySelector("#start");
   const _interfaceTiles = document.querySelectorAll(".tile");
   const _playerInfo = document.querySelectorAll("input");
 
-  const _initListeners = () => {
-    _interfaceTiles.forEach((tile) =>
-      tile.addEventListener("click", () => {
-        // ideally there's a way to check only after at least
-        // 3 rounds
-        // call playRound and also update DOM
-      })
-    );
+  const emptyTiles = () => {
+    for (let i = 0; i < _interfaceTiles.length; i += 1) {
+      _interfaceTiles[i].textContent = "";
+    }
   };
 
-  // we'll have to handle this based on player turn
+  const setTile = (index, sign) => {
+    _interfaceTiles[index].textContent = sign;
+  };
+
+  // add event listeners to each tile
+
+  for (let i = 0; i < _interfaceTiles.length; i += 1) {
+    _interfaceTiles[i].addEventListener("click", (event) => {
+      event.stopPropagation();
+
+      if (!_interfaceTiles[i].textContent && !gameController.getGameStatus()) {
+        setTile(i, gameController.getCurrentPlayer().getSign());
+        gameController.playRound(gameBoard, i);
+
+        if (gameController.getGameStatus()) {
+          // display winner
+        }
+      }
+    });
+  }
+
   _startButton.addEventListener("click", (event) => {
     event.preventDefault();
     event.stopPropagation();
 
+    emptyTiles();
     gameBoard.resetBoard();
-
     gameController.initPlayers(
       _playerInfo[0].value,
       _playerInfo[1].value,
       _playerInfo[2].value,
       _playerInfo[3].value
     );
-    _initListeners();
   });
 
   return {};
