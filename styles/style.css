@@ -1,0 +1,20 @@
+form {
+    display: flex;
+    gap: 20px;
+}
+
+label {
+    display: block;
+    margin: 10px;
+}
+
+#grid-container {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+}
+
+#grid-container > div {
+    border: 1px solid black;
+}
