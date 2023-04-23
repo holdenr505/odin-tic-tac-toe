@@ -8,38 +8,35 @@
   <meta description="Play tic tac toe online">
 
   <link rel="stylesheet" href="./styles/style.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Amatic+SC">
 
   <script src="./scripts/script.js" defer></script>
 
   <title>Tic Tac Toe</title>
 </head>
 <body>
+  <header>
+    <h1>Tic Tac Toe</h1>
+  </header>
   <main>
-    <form action="" method="get">
+    <form action="" method="">
       <div>
-        <div>
-          <label for="playername">Enter Name</label>
-          <input type="text" id="playername" name="playername">
-        </div>
-        <div>
-          <label for="playersign">Enter X or O</label>
-          <input type="text">
-        </div>
+        <label for="playerOneName">
+          Player One: 
+        </label>
+        <input type="text" id="playerOneName" name="playerOneName"
+        required>
       </div>
-        
       <div>
-        <div>
-          <label for="playertwoname"></label>
-          <input type="text" id="playertwoname" name="playertwoname">
-        </div>
-        <div>
-          <label for="playertwosign"></label>
-          <input type="text" id="playertwosign" name="playertwosign">
-        </div>
-      </div>
-      <button id="start">START</button>
-    </form>
+        <label for="playerTwoName">
+          Player Two: 
+        </label>
+        <input type="text" id="playerTwoName" name="playerTwoName"
+        required>
 
+        <button id="start">Play</button>
+      </div>
+    </form>
     <div id="grid-container">
       <div class="tile"></div>
       <div class="tile"></div>
@@ -52,5 +49,8 @@
       <div class="tile"></div>
     </div>
   </main>
+  <footer>
+    <a href="https://www.github.com/omni23">Coded by Omni23</a>
+  </footer>
 </body>    
 </html>
