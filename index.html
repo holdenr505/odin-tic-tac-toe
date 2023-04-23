@@ -19,7 +19,8 @@
     <h1>Tic Tac Toe</h1>
   </header>
   <main>
-    <form action="" method="">
+    <div id="status-text"></div>
+    <form action="" method="" id="player-form">
       <div>
         <label for="playerOneName">
           Player One: 
@@ -33,8 +34,6 @@
         </label>
         <input type="text" id="playerTwoName" name="playerTwoName"
         required>
-
-        <button id="start">Play</button>
       </div>
     </form>
     <div id="grid-container">
@@ -48,6 +47,8 @@
       <div class="tile"></div>
       <div class="tile"></div>
     </div>
+
+    <button id="start" form="player-form">Play</button>
   </main>
   <footer>
     <a href="https://www.github.com/omni23">Coded by Omni23</a>
