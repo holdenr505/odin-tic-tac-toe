@@ -37,6 +37,7 @@ main {
 #status-text {
     margin: 40px 0;
     font-size: 2rem;
+    text-align: center;
 }
 
 form {
