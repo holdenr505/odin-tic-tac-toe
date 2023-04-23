@@ -39,7 +39,7 @@ const gameController = (function () {
 
   const getCurrentPlayer = () => _currentPlayer;
   const getWinningPlayer = () => _winningPlayer;
-  const getGameStatus = () => _gameOver;
+  const getGameOver = () => _gameOver;
 
   const _checkWin = (boardArray) => {
     const winStates = [
@@ -62,12 +62,13 @@ const gameController = (function () {
     return winningSign.length > 0 ? boardArray[winningSign[0][0]] : "";
   };
 
-  const initPlayers = (nameOne, signOne, nameTwo, signTwo) => {
-    _playerOne = Player(nameOne, signOne);
-    _playerTwo = Player(nameTwo, signTwo);
+  const initPlayers = (nameOne, nameTwo) => {
+    _playerOne = Player(nameOne, "x");
+    _playerTwo = Player(nameTwo, "o");
 
     _currentPlayer = _playerOne;
     _gameOver = false;
+    _winningPlayer = null;
   };
 
   const playRound = (board, index) => {
@@ -86,6 +87,8 @@ const gameController = (function () {
 
       if (_winningPlayer) {
         board.resetBoard();
+        _winningPlayer =
+          _playerOne.getSign() === _winningPlayer ? _playerOne : _playerTwo;
         _gameOver = true;
         _roundCount = 1;
         return;
@@ -107,7 +110,7 @@ const gameController = (function () {
     playRound,
     getCurrentPlayer,
     getWinningPlayer,
-    getGameStatus,
+    getGameOver,
   };
 })();
 
@@ -115,6 +118,7 @@ const gameController = (function () {
 
 const displayController = (function () {
   const _startButton = document.querySelector("#start");
+  const _statusText = document.querySelector("#status-text");
   const _interfaceTiles = document.querySelectorAll(".tile");
   const _playerInfo = document.querySelectorAll("input");
 
@@ -134,12 +138,23 @@ const displayController = (function () {
     _interfaceTiles[i].addEventListener("click", (event) => {
       event.stopPropagation();
 
-      if (!_interfaceTiles[i].textContent && !gameController.getGameStatus()) {
+      if (!_interfaceTiles[i].textContent && !gameController.getGameOver()) {
         setTile(i, gameController.getCurrentPlayer().getSign());
         gameController.playRound(gameBoard, i);
 
-        if (gameController.getGameStatus()) {
-          // display winner
+        if (
+          gameController.getGameOver() &&
+          gameController.getWinningPlayer() !== "Tie"
+        ) {
+          _statusText.textContent = `${gameController
+            .getWinningPlayer()
+            .getName()} wins!`;
+        } else if (gameController.getWinningPlayer() === "Tie") {
+          _statusText.textContent = "It's a tie!";
+        } else {
+          _statusText.textContent = `${gameController
+            .getCurrentPlayer()
+            .getName()}'s turn`;
         }
       }
     });
@@ -151,12 +166,10 @@ const displayController = (function () {
 
     emptyTiles();
     gameBoard.resetBoard();
-    gameController.initPlayers(
-      _playerInfo[0].value,
-      _playerInfo[1].value,
-      _playerInfo[2].value,
-      _playerInfo[3].value
-    );
+    gameController.initPlayers(_playerInfo[0].value, _playerInfo[1].value);
+    _statusText.textContent = `${gameController
+      .getCurrentPlayer()
+      .getName()}'s turn`;
   });
 
   return {};
