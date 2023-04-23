@@ -1,3 +1,44 @@
+* {
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+    box-sizing: border-box;
+    background: none;
+    font-family: "Amatic SC";
+    font-size: 1.25rem;
+}
+
+/*stuff*/
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    padding: 20px;
+    text-align: center;
+}
+
+h1 {
+    font-size: clamp(1.5rem, 2.5vw + 1rem, 2.5rem);
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#status-text {
+    margin: 40px 0;
+    font-size: 2rem;
+}
+
 form {
     display: flex;
     gap: 20px;
@@ -5,16 +46,44 @@ form {
 
 label {
     display: block;
-    margin: 10px;
+    text-align: center;
+}
+
+input {
+    padding: 5px;
+    width: 125px;
+    border-radius: 5px;
+    background-color: rgb(230, 230, 230);
+}
+
+button {
+    cursor: pointer;
 }
 
 #grid-container {
-    margin-top: 10px;
     display: grid;
-    grid-template-columns: repeat(3, 100px);
-    grid-template-rows: repeat(3, 100px);
+    grid-template-columns: repeat(3, 90px);
+    grid-template-rows: repeat(3, 90px);
+    margin: 20px 0;
 }
 
-#grid-container > div {
-    border: 1px solid black;
+.tile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: solid 1px white;
+    border-radius: 5px;
+    color: white;
+    font-family: sans-serif;
+    background-color: blue;
+}
+
+footer {
+    padding: 20px;
+    text-align: center;
+}
+
+a {
+    text-decoration: none;
+    color: black;
 }
