@@ -164,6 +164,16 @@ const displayController = (function () {
     event.preventDefault();
     event.stopPropagation();
 
+    if (_playerInfo[0].value === "" || _playerInfo[1].value === "") {
+      _statusText.textContent = "Please enter a name";
+      return;
+    }
+
+    if (_playerInfo[0].value === _playerInfo[1].value) {
+      _statusText.textContent = "No duplicate names allowed";
+      return;
+    }
+
     emptyTiles();
     gameBoard.resetBoard();
     gameController.initPlayers(_playerInfo[0].value, _playerInfo[1].value);
