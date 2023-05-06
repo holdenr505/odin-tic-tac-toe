@@ -18,30 +18,45 @@ const gameBoard = (function () {
 
   const getBoardTile = (index) => _boardTiles[index];
 
+  const getEmptyTiles = () => {
+    const emptyTiles = [];
+
+    for (let i = 0; i < _boardTiles.length; i += 1) {
+      if (_boardTiles[i] === "") {
+        emptyTiles.push(i);
+      }
+    }
+
+    return emptyTiles;
+  };
+
   const getBoard = () => _boardTiles;
 
   const resetBoard = () => {
     _boardTiles.fill("");
   };
 
-  return { setBoardTile, getBoardTile, getBoard, resetBoard };
+  return { setBoardTile, getBoardTile, getBoard, resetBoard, getEmptyTiles };
 })();
 
 // GAME CONTROLLER
 
 const gameController = (function () {
-  let _playerOne = null;
-  let _playerTwo = null;
-  let _currentPlayer = null;
+  let _playerOne;
+  let _playerTwo;
+  let _currentPlayer;
   let _roundCount = 1;
-  let _winningPlayer = null;
+  let _winningPlayer;
   let _gameOver = true;
 
+  const getPlayerOne = () => _playerOne;
+  const getPlayerTwo = () => _playerTwo;
   const getCurrentPlayer = () => _currentPlayer;
   const getWinningPlayer = () => _winningPlayer;
   const getGameOver = () => _gameOver;
+  const getRoundCount = () => _roundCount;
 
-  const _checkWin = (boardArray) => {
+  const checkWin = (boardArray) => {
     const winStates = [
       [0, 1, 2],
       [3, 4, 5],
@@ -59,15 +74,23 @@ const gameController = (function () {
         state.every((index) => boardArray[index] === "o")
     );
 
+    // check if every spot on the board is filled
+    // and if no winning sign was returned then
+    // game results in a tie
+    if (winningSign.length === 0 && boardArray.every((index) => index)) {
+      return "Tie";
+    }
+
     return winningSign.length > 0 ? boardArray[winningSign[0][0]] : "";
   };
 
-  const initPlayers = (nameOne, nameTwo) => {
+  const initGame = (nameOne, nameTwo) => {
     _playerOne = Player(nameOne, "x");
     _playerTwo = Player(nameTwo, "o");
 
     _currentPlayer = _playerOne;
     _gameOver = false;
+    _roundCount = 1;
     _winningPlayer = null;
   };
 
@@ -83,21 +106,15 @@ const gameController = (function () {
     _currentPlayer = _currentPlayer === _playerOne ? _playerTwo : _playerOne;
 
     if (_roundCount >= 5) {
-      _winningPlayer = _checkWin(board.getBoard());
+      _winningPlayer = checkWin(board.getBoard());
 
       if (_winningPlayer) {
         board.resetBoard();
-        _winningPlayer =
-          _playerOne.getSign() === _winningPlayer ? _playerOne : _playerTwo;
         _gameOver = true;
-        _roundCount = 1;
-        return;
-      }
-      if (_roundCount === 9) {
-        board.resetBoard();
-        _winningPlayer = "Tie";
-        _gameOver = true;
-        _roundCount = 1;
+        if (_winningPlayer !== "Tie") {
+          _winningPlayer =
+            _playerOne.getSign() === _winningPlayer ? _playerOne : _playerTwo;
+        }
         return;
       }
     }
@@ -106,12 +123,83 @@ const gameController = (function () {
   };
 
   return {
-    initPlayers,
+    initGame,
     playRound,
     getCurrentPlayer,
     getWinningPlayer,
     getGameOver,
+    checkWin,
+    getRoundCount,
+    getPlayerOne,
+    getPlayerTwo,
   };
+})();
+
+// AI
+
+// for min and max each position on the board
+// will be assigned a score passed up from the
+// function call that reaches a terminal position
+// then choose the position associated with the best
+// score for min or max
+
+const artificialIntelligence = (function () {
+  const _getTerminalValue = (sign) => {
+    let value;
+    if (sign === "Tie") {
+      value = 0;
+    } else if (sign === "x") {
+      value = 1;
+    } else if (sign === "o") {
+      value = -1;
+    }
+
+    return value;
+  };
+
+  const minimax = (board, player) => {
+    const terminalState = gameController.checkWin(board.getBoard());
+
+    if (terminalState) {
+      return { score: _getTerminalValue(terminalState) };
+    }
+
+    const freeSpaces = board.getEmptyTiles();
+    let bestScore;
+    let bestIndex;
+
+    if (player.getSign() === "x") {
+      bestScore = -2;
+      for (let i = 0; i < freeSpaces.length; i += 1) {
+        board.setBoardTile(player.getSign(), freeSpaces[i]);
+        const result = minimax(board, gameController.getPlayerTwo()).score;
+
+        if (result > bestScore) {
+          bestScore = result;
+          bestIndex = freeSpaces[i];
+        }
+
+        board.setBoardTile("", freeSpaces[i]);
+      }
+    } else {
+      bestScore = 2;
+      for (let i = 0; i < freeSpaces.length; i += 1) {
+        board.setBoardTile(player.getSign(), freeSpaces[i]);
+        const result = minimax(board, gameController.getPlayerOne()).score;
+
+        if (result < bestScore) {
+          bestScore = result;
+          bestIndex = freeSpaces[i];
+        }
+
+        board.setBoardTile("", freeSpaces[i]);
+      }
+    }
+
+    return { score: bestScore, index: bestIndex };
+  };
+
+  return { minimax };
 })();
 
 // DISPLAY
@@ -176,7 +264,7 @@ const displayController = (function () {
 
     emptyTiles();
     gameBoard.resetBoard();
-    gameController.initPlayers(_playerInfo[0].value, _playerInfo[1].value);
+    gameController.initGame(_playerInfo[0].value, _playerInfo[1].value);
     _statusText.textContent = `${gameController
       .getCurrentPlayer()
       .getName()}'s turn`;
