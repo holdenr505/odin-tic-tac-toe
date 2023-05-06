@@ -121,6 +121,10 @@ button {
     background-color: pink;
 }
 
+.tile:hover {
+    background-color: rgb(240, 180, 190);
+}
+
 footer {
     padding: 20px;
     text-align: center;
