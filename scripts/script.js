@@ -54,7 +54,7 @@ const gameController = (function () {
   const getCurrentPlayer = () => _currentPlayer;
   const getWinningPlayer = () => _winningPlayer;
   const getGameOver = () => _gameOver;
-  const getRoundCount = () => _roundCount;
+  const getRound = () => _roundCount;
 
   const checkWin = (boardArray) => {
     const winStates = [
@@ -125,11 +125,11 @@ const gameController = (function () {
   return {
     initGame,
     playRound,
+    checkWin,
     getCurrentPlayer,
     getWinningPlayer,
     getGameOver,
-    checkWin,
-    getRoundCount,
+    getRound,
     getPlayerOne,
     getPlayerTwo,
   };
@@ -209,6 +209,7 @@ const displayController = (function () {
   const _statusText = document.querySelector("#status-text");
   const _interfaceTiles = document.querySelectorAll(".tile");
   const _playerInfo = document.querySelectorAll("input[type='text'");
+  const _aiToggle = document.querySelector("input[type='checkbox'");
 
   const emptyTiles = () => {
     for (let i = 0; i < _interfaceTiles.length; i += 1) {
@@ -224,47 +225,72 @@ const displayController = (function () {
 
   for (let i = 0; i < _interfaceTiles.length; i += 1) {
     _interfaceTiles[i].addEventListener("click", (event) => {
-      event.stopPropagation();
-
       if (!_interfaceTiles[i].textContent && !gameController.getGameOver()) {
         setTile(i, gameController.getCurrentPlayer().getSign());
         gameController.playRound(gameBoard, i);
 
-        if (
-          gameController.getGameOver() &&
-          gameController.getWinningPlayer() !== "Tie"
-        ) {
-          _statusText.textContent = `${gameController
-            .getWinningPlayer()
-            .getName()} wins!`;
-        } else if (gameController.getWinningPlayer() === "Tie") {
-          _statusText.textContent = "It's a tie!";
+        // if AI is enabled, let it make a play
+        if (_aiToggle.checked && gameController.getRound() < 9) {
+          const aiPlay = artificialIntelligence.minimax(
+            gameBoard,
+            gameController.getCurrentPlayer()
+          );
+
+          setTile(aiPlay.index, gameController.getCurrentPlayer().getSign());
+          gameController.playRound(gameBoard, aiPlay.index);
+        }
+
+        // check if game is over and determine winner
+        if (gameController.getGameOver()) {
+          _statusText.textContent =
+            gameController.getWinningPlayer() === "Tie"
+              ? "It's a tie!"
+              : `${gameController.getWinningPlayer().getName()} wins!`;
         } else {
           _statusText.textContent = `${gameController
             .getCurrentPlayer()
-            .getName()}'s turn`;
+            .getName()}'s turn!`;
         }
       }
     });
   }
 
+  _aiToggle.addEventListener("click", (event) => {
+    if (event.target.checked) {
+      _playerInfo[1].disabled = true;
+    } else {
+      _playerInfo[1].disabled = false;
+    }
+  });
+
   _startButton.addEventListener("click", (event) => {
     event.preventDefault();
-    event.stopPropagation();
 
-    if (_playerInfo[0].value === "" || _playerInfo[1].value === "") {
-      _statusText.textContent = "Please enter a name";
-      return;
-    }
-
-    if (_playerInfo[0].value === _playerInfo[1].value) {
-      _statusText.textContent = "No duplicate names allowed";
-      return;
+    if (_aiToggle.checked) {
+      if (_playerInfo[0].value === "") {
+        _statusText.textContent = "Please enter a name";
+        return;
+      } else if (_playerInfo[0].value === "AI") {
+        _statusText.textContent = "Name is reserved for AI";
+        return;
+      } else {
+        gameController.initGame(_playerInfo[0].value, "AI");
+      }
+    } else if (!_aiToggle.checked) {
+      if (_playerInfo[0].value === "" || _playerInfo[1].value === "") {
+        _statusText.textContent = "Please enter a name";
+        return;
+      } else if (_playerInfo[0].value === _playerInfo[1].value) {
+        _statusText.textContent = "No duplicate names allowed";
+        return;
+      } else {
+        gameController.initGame(_playerInfo[0].value, _playerInfo[1].value);
+      }
     }
 
     emptyTiles();
     gameBoard.resetBoard();
-    gameController.initGame(_playerInfo[0].value, _playerInfo[1].value);
+
     _statusText.textContent = `${gameController
       .getCurrentPlayer()
       .getName()}'s turn`;
