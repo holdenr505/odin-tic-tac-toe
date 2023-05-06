@@ -45,9 +45,51 @@ form {
     gap: 20px;
 }
 
-label {
+form > div > label {
     display: block;
     text-align: center;
+}
+
+main > div:nth-child(2) {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.toggle {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 30px;
+    border-radius: 30px;
+    background-color: rgb(230, 230, 230);
+    transition: 0.4s;
+}
+
+.toggle::before {
+    content: "";
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    background-color: #fff;
+    border-radius: 50px;
+    transition: 0.4s;
+}
+
+input[type="checkbox"]:checked + .toggle {
+    background-color: blue;
+}
+
+input[type="checkbox"]:checked + .toggle::before {
+    transform: translateX(30px);
+}
+
+input[type="checkbox"] {
+    display: none;
 }
 
 input {

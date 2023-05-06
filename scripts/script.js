@@ -208,7 +208,7 @@ const displayController = (function () {
   const _startButton = document.querySelector("#start");
   const _statusText = document.querySelector("#status-text");
   const _interfaceTiles = document.querySelectorAll(".tile");
-  const _playerInfo = document.querySelectorAll("input");
+  const _playerInfo = document.querySelectorAll("input[type='text'");
 
   const emptyTiles = () => {
     for (let i = 0; i < _interfaceTiles.length; i += 1) {
