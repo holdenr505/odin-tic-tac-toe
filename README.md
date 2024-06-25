@@ -18,7 +18,7 @@ with one another.
 
 ### Links
 
-- Live Site URL: [Live Site](https://omni23.github.io/odin-tic-tac-toe)
+- Live Site URL: [Live Site](https://where-da-bones.github.io/odin-tic-tac-toe)
 
 ### To Do
 
