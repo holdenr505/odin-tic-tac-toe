@@ -6,15 +6,14 @@ for the open source Odin Project curriculum
 ## Table of contents
 
 - [Overview](#overview)
-  - [Features](#features)
   - [Links](#links)
   - [Built with](#built-with)
 
 ## Overview
 
-A game of tic-tac-toe that allows
-two players to enter their name and compete
-with one another.
+A game of tic-tac-toe that allows the player to
+complete with another person or an AI implemented
+with the MiniMax algorithm
 
 ### Links
 
