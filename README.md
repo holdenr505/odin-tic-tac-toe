@@ -20,11 +20,6 @@ with one another.
 
 - Live Site URL: [Live Site](https://holdenr505.github.io/odin-tic-tac-toe)
 
-### To Do
-
-- Add AI with multiple difficulty levels
-- Allow players to change/choose their sign
-
 ### Built with
 
 - HTML5
